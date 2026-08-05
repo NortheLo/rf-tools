@@ -1,13 +1,12 @@
 use num_traits::Float;
-
-pub const LIGHTSPEED: f64 = 299_792_458.0;
+use crate::constants::SPEED_OF_LIGHT;
 
 pub fn freq_to_wavelength<T: Float>(freq: T) -> T {
-    T::from(LIGHTSPEED).unwrap() / freq
+    T::from(SPEED_OF_LIGHT).unwrap() / freq
 }
 
 pub fn wavelength_to_freq<T: Float>(wavelength: T) -> T {
-    T::from(LIGHTSPEED).unwrap() / wavelength
+    T::from(SPEED_OF_LIGHT).unwrap() / wavelength
 }
 
 pub fn lin_to_db_pwr<T: Float>(x: T) -> T {

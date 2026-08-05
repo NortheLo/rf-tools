@@ -1,6 +1,8 @@
 mod radar_equations;
 mod conversion;
 pub mod telcom_equations;
+pub mod design;
+pub mod constants;
 
 use crate::radar_equations::albersheim;
 use conversion::db_pwr_to_lin;

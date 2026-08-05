@@ -26,7 +26,7 @@ pub fn albersheim(p_d: f64, p_fa: f64, n: u64) -> Result<f64, RadarEquationsErro
             + (6.2 + 4.54 / (n as f64 + 0.44).sqrt())
             * (a + 0.12 * a * b + 1.7 * b).log10();
 
-    if snr.is_normal() {
+    if snr.is_finite() {
         Ok(snr)
     }
     else {
