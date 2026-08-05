@@ -19,15 +19,15 @@ pub fn albersheim(p_d: f64, p_fa: f64, n: u64) -> Result<f64, RadarEquationsErro
         return Err(RadarEquationsErrors::InvalidPulseCount);
     }
 
-    let A = (0.62 / p_fa).ln();
-    let B = (p_d / (1.0 - p_d)).ln();
+    let a = (0.62 / p_fa).ln();
+    let b = (p_d / (1.0 - p_d)).ln();
 
-    let SNR = -5.0 * (n as f64).log10()
+    let snr = -5.0 * (n as f64).log10()
             + (6.2 + 4.54 / (n as f64 + 0.44).sqrt())
-            * (A + 0.12 * A * B + 1.7 * B).log10();
+            * (a + 0.12 * a * b + 1.7 * b).log10();
 
-    if SNR.is_normal() {
-        Ok(SNR)
+    if snr.is_normal() {
+        Ok(snr)
     }
     else {
         Err(RadarEquationsErrors::IsInvalid)
