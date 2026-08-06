@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum RadarEquationsErrors {
+pub enum RadarEquationsErrors {
     InvalidDetectionProbability,
     InvalidFalseAlarmProbability,
     InvalidPulseCount,
