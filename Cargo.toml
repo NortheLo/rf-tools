@@ -13,3 +13,4 @@ num-traits = "0.2.19"
 
 # for debugging purposes
 proptest = "1.11.0"
+csv = "1.4.0"
