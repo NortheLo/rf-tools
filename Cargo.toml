@@ -2,6 +2,11 @@
 name = "rf-tools"
 version = "0.1.0"
 edition = "2024"
+description = "Contains equations and tools for radio-frequency tasks"
+license-file = "MIT"
+keywords = ["rf", "radio", "radar", "telecommunication", "dsp"]
+readme = "README.md"
+repository = "https://github.com/NortheLo/rf-tools.git"
 
 [dependencies]
 proptest = "1.11.0"
