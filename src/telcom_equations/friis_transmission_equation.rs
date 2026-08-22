@@ -1,25 +1,13 @@
-use num_traits::Float;
 use crate::conversion::lin_to_db_amp;
-pub fn friis_equation_lin<T: Float>(
-    p_tx: T,
-    g_tx: T,
-    g_rx: T,
-    lambda: T,
-    distance: T,
-) -> T {
+use num_traits::Float;
+pub fn friis_equation_lin<T: Float>(p_tx: T, g_tx: T, g_rx: T, lambda: T, distance: T) -> T {
     let four_pi = T::from(4.0 * std::f64::consts::PI).unwrap();
 
     let factor = lambda / (four_pi * distance);
     p_tx * g_tx * g_rx * factor.powi(2)
 }
 
-pub fn friis_equation_log<T: Float>(
-    p_tx: T,
-    g_tx: T,
-    g_rx: T,
-    lambda: T,
-    distance: T,
-) -> T {
+pub fn friis_equation_log<T: Float>(p_tx: T, g_tx: T, g_rx: T, lambda: T, distance: T) -> T {
     let four_pi = T::from(4.0 * std::f64::consts::PI).unwrap();
 
     p_tx + g_tx + g_rx + lin_to_db_amp(lambda / (four_pi * distance))
@@ -56,8 +44,7 @@ mod tests {
         let lambda = 0.5;
         let distance = 2.0;
 
-        let result =
-            friis_equation_lin(p_tx, g_tx, g_rx, lambda, distance);
+        let result = friis_equation_lin(p_tx, g_tx, g_rx, lambda, distance);
 
         let expected = 0.015831434944115281;
         approx_eq(result, expected);

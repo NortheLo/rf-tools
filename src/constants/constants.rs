@@ -1,4 +1,3 @@
-
 pub mod electromagnetic {
     // Boltzmann-Constant from Wikipedia
     pub const BOLTZMANN_CONSTANT: f64 = 1.380_649e-23; // [J/K]

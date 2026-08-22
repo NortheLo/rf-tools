@@ -21,11 +21,9 @@ fn thermal_noise_power(temperature: f64, bandwidth: f64) -> Result<f64, Error> {
         return Err(Error::InvalidBandwidth);
     }
 
-
     let np = BOLTZMANN_CONSTANT * temperature * bandwidth;
 
     np.is_finite().then_some(np).ok_or(Error::NonFinite)
-
 }
 
 #[cfg(test)]

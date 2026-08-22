@@ -1,5 +1,5 @@
-use num_traits::Float;
 use crate::constants::SPEED_OF_LIGHT;
+use num_traits::Float;
 
 pub fn freq_to_wavelength<T: Float>(freq: T) -> T {
     T::from(SPEED_OF_LIGHT).unwrap() / freq
@@ -32,8 +32,6 @@ pub fn w_to_dbm<T: Float>(p: T) -> T {
 pub fn dbm_to_w<T: Float>(p: T) -> T {
     db_pwr_to_lin(p) / T::from(1000.0).unwrap()
 }
-
-
 
 #[cfg(test)]
 mod tests {

@@ -1,6 +1,5 @@
-use rf_tools::radar_equations::{albersheim, shnidman, SwerlingCase};
 use rf_tools::conversion::db_pwr_to_lin;
-
+use rf_tools::radar_equations::{SwerlingCase, albersheim, shnidman};
 
 fn main() {
     let snr = albersheim(0.5, 1e-6, 1).expect("Should run");

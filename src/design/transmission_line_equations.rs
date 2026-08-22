@@ -13,7 +13,10 @@ fn reflection_coefficient(z_0: f64, z_l: f64) -> Result<f64, Error> {
     // Source: https://en.wikipedia.org/wiki/Reflection_coefficient
     let ref_coef = (z_l - z_0) / (z_l + z_0);
 
-    ref_coef.is_finite().then_some(ref_coef).ok_or(Error::NonFinite)
+    ref_coef
+        .is_finite()
+        .then_some(ref_coef)
+        .ok_or(Error::NonFinite)
 }
 
 fn vswr(reflection_coeff: f64) -> Result<f64, Error> {
@@ -27,7 +30,7 @@ fn vswr(reflection_coeff: f64) -> Result<f64, Error> {
         return Err(Error::InvalidReflectionCoefficient);
     }
 
-    let vswr = (1.0 + reflection_coeff.abs())/(1.0 - reflection_coeff.abs());
+    let vswr = (1.0 + reflection_coeff.abs()) / (1.0 - reflection_coeff.abs());
 
     vswr.is_finite().then_some(vswr).ok_or(Error::NonFinite)
 }

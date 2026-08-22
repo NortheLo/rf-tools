@@ -1,6 +1,6 @@
-use num_traits::signum;
-use num_traits::float::Float;
 use super::radar_equations_errors::RadarEquationsErrors;
+use num_traits::float::Float;
+use num_traits::signum;
 
 /// Swerling target fluctuation models used in radar detection analysis.
 ///
@@ -50,7 +50,6 @@ pub enum SwerlingCase {
     /// The RCS is constant over time and does not fluctuate.
     V,
 }
-
 
 impl SwerlingCase {
     pub fn k(&self, n: usize) -> f64 {
@@ -102,7 +101,12 @@ impl SwerlingCase {
 ///
 /// This implementation assumes a fluctuating target model and
 /// non-coherent pulse integration.
-pub fn shnidman(p_d: f64, p_fa: f64, n: usize, model: SwerlingCase) -> Result<f64, RadarEquationsErrors> {
+pub fn shnidman(
+    p_d: f64,
+    p_fa: f64,
+    n: usize,
+    model: SwerlingCase,
+) -> Result<f64, RadarEquationsErrors> {
     if 0.0 >= p_d && p_d > 1.0 {
         return Err(RadarEquationsErrors::InvalidDetectionProbability);
     }
@@ -118,21 +122,27 @@ pub fn shnidman(p_d: f64, p_fa: f64, n: usize, model: SwerlingCase) -> Result<f6
     let k = model.k(n);
     let alpha = model.alpha(n);
 
-    let eta = Float::sqrt(-0.8 * Float::ln(4.0 * p_fa * (1.0 - p_fa))) +
-                    signum(p_d - 0.5) * Float::sqrt(-0.8 * Float::ln(4.0 * p_d * (1.0 - p_d)));
+    let eta = Float::sqrt(-0.8 * Float::ln(4.0 * p_fa * (1.0 - p_fa)))
+        + signum(p_d - 0.5) * Float::sqrt(-0.8 * Float::ln(4.0 * p_d * (1.0 - p_d)));
     let x_inf = eta * (eta + 2.0 * Float::sqrt(n as f64 / 2.0 + (alpha - 0.25)));
 
     let c_1 = (((17.7006 * p_d - 18.4496) * p_d + 14.5339) * p_d - 3.525) / k;
-    let c_2 = (1.0 / k) * (Float::exp(27.31 * p_d - 25.14) +
-                    (p_d - 0.8) * (0.7 * Float::ln(1e-5 / p_fa) +
-                        (2.0 * n as f64 - 20.0)/80.0));
+    let c_2 = (1.0 / k)
+        * (Float::exp(27.31 * p_d - 25.14)
+            + (p_d - 0.8) * (0.7 * Float::ln(1e-5 / p_fa) + (2.0 * n as f64 - 20.0) / 80.0));
 
-    let c_db = if 0.1 <= p_d && p_d <= 0.872 { c_1 } else { c_1 + c_2 };
-    let c = Float::powf(10.0, c_db/10.0);
+    let c_db = if 0.1 <= p_d && p_d <= 0.872 {
+        c_1
+    } else {
+        c_1 + c_2
+    };
+    let c = Float::powf(10.0, c_db / 10.0);
 
     let x = 10.0 * Float::log10(c * x_inf / n as f64);
 
-    x.is_finite().then_some(x).ok_or(RadarEquationsErrors::IsInvalid)
+    x.is_finite()
+        .then_some(x)
+        .ok_or(RadarEquationsErrors::IsInvalid)
 }
 
 #[cfg(test)]
@@ -157,16 +167,14 @@ mod tests {
     #[test]
     fn test_shnidman_w_MATLAB_ref() {
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                            .join("src")
-                            .join("radar_equations")
-                            .join("test_data")
-                            .join("shnidman_reference.csv");
+            .join("src")
+            .join("radar_equations")
+            .join("test_data")
+            .join("shnidman_reference.csv");
 
-        let file = File::open(path)
-            .expect("missing MATLAB reference file");
+        let file = File::open(path).expect("missing MATLAB reference file");
 
         let mut reader = Reader::from_reader(file);
-
 
         for record in reader.records() {
             let record = record.unwrap();
@@ -188,5 +196,4 @@ mod tests {
             );
         }
     }
-
 }
