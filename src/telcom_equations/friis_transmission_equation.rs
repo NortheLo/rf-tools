@@ -1,7 +1,6 @@
 use crate::conversion::power::*;
 use num_traits::Float;
 
-
 pub fn friis_equation_lin<T: Float>(p_tx: T, g_tx: T, g_rx: T, lambda: T, distance: T) -> T {
     let four_pi = T::from(4.0 * std::f64::consts::PI).unwrap();
 

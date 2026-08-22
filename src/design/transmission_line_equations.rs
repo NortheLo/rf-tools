@@ -1,3 +1,5 @@
+use num_traits::Float;
+
 #[derive(Debug)]
 pub enum Error {
     InvalidReflectionCoefficient,
@@ -5,6 +7,28 @@ pub enum Error {
     NonFinite,
 }
 
+#[derive(Debug)]
+pub enum Reflection<T: Float> {
+    /// Short circuit, corresponding to Γ = -1.
+    Short,
+
+    /// Open circuit, corresponding to Γ = +1.
+    Open,
+
+    /// General voltage reflection coefficient.
+    Coefficient(T),
+}
+
+impl Reflection {
+    /// Returns the numerical reflection coefficient Γ.
+    pub fn coefficient<T: Float>(self) -> T {
+        match self {
+            Self::Short => -1.0,
+            Self::Open => 1.0,
+            Self::Coefficient(gamma) => gamma,
+        }
+    }
+}
 
 /// Calculates the reflection coefficient caused by an impedance mismatch
 /// between a reference impedance and a load impedance.
@@ -28,16 +52,31 @@ pub enum Error {
 /// # References
 ///
 /// * [Reflection coefficient](https://en.wikipedia.org/wiki/Reflection_coefficient)
-pub fn reflection_coefficient(z_0: f64, z_l: f64) -> Result<f64, Error> {
-    if !z_0.is_finite() || !z_l.is_finite() || z_0 <= 0.0 || z_l < 0.0 {
+pub fn reflection(
+    z_0: f64,
+    z_l: f64,
+) -> Result<Reflection, Error> {
+    if !z_0.is_finite() || z_0 <= 0.0 {
         return Err(Error::InvalidImpedance);
     }
 
-    let ref_coef = (z_l - z_0) / (z_l + z_0);
+    if z_l.is_nan() || z_l < 0.0 {
+        return Err(Error::InvalidImpedance);
+    }
 
-    ref_coef
+    if z_l == 0.0 {
+        return Ok(Reflection::Short);
+    }
+
+    if z_l == f64::INFINITY {
+        return Ok(Reflection::Open);
+    }
+
+    let gamma = (z_l - z_0) / (z_l + z_0);
+
+    gamma
         .is_finite()
-        .then_some(ref_coef)
+        .then_some(Reflection::Coefficient(gamma))
         .ok_or(Error::NonFinite)
 }
 
@@ -85,7 +124,7 @@ mod tests {
     #[test]
     fn reflection_coefficient_matched_load() {
         // Zl == Z0 -> no reflection
-        let gamma = reflection_coefficient(50.0, 50.0).unwrap();
+        let gamma = reflection(50.0, 50.0).unwrap();
 
         assert!((gamma - 0.0).abs() < EPS);
     }
@@ -94,7 +133,7 @@ mod tests {
     fn reflection_coefficient_open_circuit() {
         // Zl -> infinity gives Gamma -> 1
         // Approximate with a very large impedance
-        let gamma = reflection_coefficient(50.0, 1e15).unwrap();
+        let gamma = reflection(50.0, 1e15).unwrap();
 
         assert!((gamma - 1.0).abs() < 1e-12);
     }
@@ -102,7 +141,7 @@ mod tests {
     #[test]
     fn reflection_coefficient_short_circuit() {
         // Zl = 0 gives Gamma = -1
-        let gamma = reflection_coefficient(50.0, 0.0).unwrap();
+        let gamma = reflection(50.0, 0.0).unwrap();
 
         assert!((gamma + 1.0).abs() < EPS);
     }
@@ -110,21 +149,21 @@ mod tests {
     #[test]
     fn reflection_coefficient_typical_load() {
         // (75 - 50) / (75 + 50) = 0.2
-        let gamma = reflection_coefficient(50.0, 75.0).unwrap();
+        let gamma = reflection(50.0, 75.0).unwrap();
 
         assert!((gamma - 0.2).abs() < EPS);
     }
 
     #[test]
     fn reflection_coefficient_rejects_nan() {
-        let result = reflection_coefficient(f64::NAN, 50.0);
+        let result = reflection(f64::NAN, 50.0);
 
         assert!(result.is_err());
     }
 
     #[test]
     fn reflection_coefficient_rejects_infinity() {
-        let result = reflection_coefficient(50.0, f64::INFINITY);
+        let result = reflection(50.0, f64::INFINITY);
 
         assert!(result.is_err());
     }
