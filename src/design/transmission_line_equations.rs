@@ -19,12 +19,12 @@ pub enum Reflection<T: Float> {
     Coefficient(T),
 }
 
-impl Reflection {
+impl<T: Float> Reflection<T> {
     /// Returns the numerical reflection coefficient Γ.
-    pub fn coefficient<T: Float>(self) -> T {
+    pub fn coefficient(self) -> T {
         match self {
-            Self::Short => -1.0,
-            Self::Open => 1.0,
+            Self::Short => -T::one(),
+            Self::Open => T::one(),
             Self::Coefficient(gamma) => gamma,
         }
     }
@@ -52,32 +52,30 @@ impl Reflection {
 /// # References
 ///
 /// * [Reflection coefficient](https://en.wikipedia.org/wiki/Reflection_coefficient)
-pub fn reflection(
-    z_0: f64,
-    z_l: f64,
-) -> Result<Reflection, Error> {
-    if !z_0.is_finite() || z_0 <= 0.0 {
+pub fn reflection<T: Float>(z_0: T, z_l: T) -> Result<Reflection<T>, Error> {
+    if !z_0.is_finite() || z_0 <= T::zero() {
         return Err(Error::InvalidImpedance);
     }
 
-    if z_l.is_nan() || z_l < 0.0 {
+    if z_l.is_nan() || z_l < T::zero() {
         return Err(Error::InvalidImpedance);
     }
 
-    if z_l == 0.0 {
+    if z_l == T::zero() {
         return Ok(Reflection::Short);
     }
 
-    if z_l == f64::INFINITY {
+    if z_l == T::infinity() {
         return Ok(Reflection::Open);
     }
 
     let gamma = (z_l - z_0) / (z_l + z_0);
 
-    gamma
-        .is_finite()
-        .then_some(Reflection::Coefficient(gamma))
-        .ok_or(Error::NonFinite)
+    if !gamma.is_finite() {
+        return Err(Error::NonFinite);
+    }
+
+    Ok(Reflection::Coefficient(gamma))
 }
 
 /// Calculates the voltage standing wave ratio (VSWR) from a reflection
@@ -126,7 +124,7 @@ mod tests {
         // Zl == Z0 -> no reflection
         let gamma = reflection(50.0, 50.0).unwrap();
 
-        assert!((gamma - 0.0).abs() < EPS);
+        assert!((gamma.coefficient() - 0.0).abs() < EPS);
     }
 
     #[test]
@@ -135,7 +133,7 @@ mod tests {
         // Approximate with a very large impedance
         let gamma = reflection(50.0, 1e15).unwrap();
 
-        assert!((gamma - 1.0).abs() < 1e-12);
+        assert!((gamma.coefficient() - 1.0).abs() < 1e-12);
     }
 
     #[test]
@@ -143,7 +141,7 @@ mod tests {
         // Zl = 0 gives Gamma = -1
         let gamma = reflection(50.0, 0.0).unwrap();
 
-        assert!((gamma + 1.0).abs() < EPS);
+        assert!((gamma.coefficient() + 1.0).abs() < EPS);
     }
 
     #[test]
@@ -151,7 +149,7 @@ mod tests {
         // (75 - 50) / (75 + 50) = 0.2
         let gamma = reflection(50.0, 75.0).unwrap();
 
-        assert!((gamma - 0.2).abs() < EPS);
+        assert!((gamma.coefficient() - 0.2).abs() < EPS);
     }
 
     #[test]
@@ -162,10 +160,10 @@ mod tests {
     }
 
     #[test]
-    fn reflection_coefficient_rejects_infinity() {
-        let result = reflection(50.0, f64::INFINITY);
+    fn reflection_coefficient_infinity_as_open() {
+        let result = reflection(50.0, f64::INFINITY).unwrap();
 
-        assert!(result.is_err());
+        assert!(result.coefficient() - 1.0 < EPS);
     }
 
     #[test]
