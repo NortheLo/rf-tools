@@ -1,4 +1,5 @@
 use crate::constants::BOLTZMANN_CONSTANT;
+use num_traits::{Float, FromPrimitive};
 
 #[derive(Debug)]
 pub enum Error {
@@ -7,21 +8,34 @@ pub enum Error {
     InvalidTemperature,
 }
 
-pub fn thermal_noise_power(temperature: f64, bandwidth: f64) -> Result<f64, Error> {
-    // Power of thermal noise in defined by P_noise = k_b * T * BW
-    // Args:
-    // Temperature [K]
-    // Bandwidth [1/s]
-    // Source: https://en.wikipedia.org/wiki/Johnson%E2%80%93Nyquist_noise
-    if !temperature.is_finite() || temperature < 0.0 {
+/// Power of thermal noise in defined by P_noise = k_b * T * BW
+///
+/// # Arguments:
+///
+/// Temperature [K]
+/// Bandwidth [1/s]
+///
+/// # Returns:
+///
+/// Power of noise [lin]
+///
+/// Source: https://en.wikipedia.org/wiki/Johnson%E2%80%93Nyquist_noise
+pub fn thermal_noise_power<T: Float + FromPrimitive>(
+    temperature: T,
+    bandwidth: T,
+) -> Result<T, Error> {
+    if !temperature.is_finite() || temperature < T::zero() {
         return Err(Error::InvalidTemperature);
     }
 
-    if !bandwidth.is_finite() || bandwidth < 0.0 {
+    if !bandwidth.is_finite() || bandwidth < T::zero() {
         return Err(Error::InvalidBandwidth);
     }
 
-    let np = BOLTZMANN_CONSTANT * temperature * bandwidth;
+    let k = T::from_f64(BOLTZMANN_CONSTANT)
+        .expect("Boltzmann constant must be representable as a floating-point value");
+
+    let np = k * temperature * bandwidth;
 
     np.is_finite().then_some(np).ok_or(Error::NonFinite)
 }

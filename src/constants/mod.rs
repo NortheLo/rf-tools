@@ -1,3 +1,3 @@
-mod electromagnet;
+mod electromagnetic;
 
-pub use electromagnet::electromagnetic::*;
+pub use electromagnetic::*;
