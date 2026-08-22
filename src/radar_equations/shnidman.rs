@@ -2,14 +2,55 @@ use num_traits::signum;
 use num_traits::float::Float;
 use super::radar_equations_errors::RadarEquationsErrors;
 
+/// Swerling target fluctuation models used in radar detection analysis.
+///
+/// The Swerling models describe different statistical behaviors of the
+/// radar cross section (RCS) of a fluctuating target. The cases differ
+/// primarily in how quickly the target's RCS changes relative to the
+/// radar's pulse repetition interval.
+///
+/// # References
+///
+/// * P. Swerling, "Probability of Detection for Fluctuating Targets,"
+///   *IRE Transactions on Information Theory*, 1954.
+/// * Mark A. Richards, *Fundamentals of Radar Signal Processing*.
 #[derive(Debug, Clone, Copy)]
 pub enum SwerlingCase {
+    /// Swerling Case I: slow fluctuations with a constant mean RCS
+    /// during a scan.
+    ///
+    /// The RCS is assumed to remain constant over a scan and change
+    /// independently from scan to scan. The target follows a
+    /// chi-square distribution with two degrees of freedom.
     I,
+
+    /// Swerling Case II: fast fluctuations with an exponential RCS
+    /// distribution.
+    ///
+    /// The RCS changes independently from pulse to pulse and follows
+    /// a chi-square distribution with two degrees of freedom.
     II,
+
+    /// Swerling Case III: slow fluctuations with a constant mean RCS
+    /// during a scan.
+    ///
+    /// The RCS remains constant over a scan and changes independently
+    /// from scan to scan. The target follows a chi-square distribution
+    /// with four degrees of freedom.
     III,
+
+    /// Swerling Case IV: fast fluctuations with a four-degree-of-freedom
+    /// chi-square RCS distribution.
+    ///
+    /// The RCS changes independently from pulse to pulse.
     IV,
+
+    /// Swerling Case V: non-fluctuating target.
+    ///
+    /// The RCS is constant over time and does not fluctuate.
     V,
 }
+
 
 impl SwerlingCase {
     pub fn k(&self, n: usize) -> f64 {
@@ -39,17 +80,29 @@ impl SwerlingCase {
     }
 }
 
+/// Calculates the minimum required SNR for a fluctuating target
+/// using the Shnidman equation.
+///
+/// # Arguments
+///
+/// * `p_d` - Probability of detection.
+/// * `p_fa` - Probability of false alarm.
+/// * `n` - Number of non-coherently integrated pulses.
+///
+/// # Returns
+///
+/// The minimum required SNR in linear scale.
+///
+/// # References
+///
+/// * David A. Shnidman, *Radar Detection Probabilities and Their Calculation* (1995).
+/// * Mark A. Richards, *Fundamentals of Radar Signal Processing*.
+///
+/// # Notes
+///
+/// This implementation assumes a fluctuating target model and
+/// non-coherent pulse integration.
 pub fn shnidman(p_d: f64, p_fa: f64, n: usize, model: SwerlingCase) -> Result<f64, RadarEquationsErrors> {
-    // shnidman equation for fluctuating targets
-    // Args:
-    // P_d: Probability of detection
-    // P_fa: Fals-Alarm Probability
-    // n: Number in incoherent integrated pulses
-    // Returns:
-    // SNR: Minimum SNR needed
-    // Source:
-    // "Radar Detection Probabilities and Their Calculation" 1995 David A. Shnidmann
-    // "Fundamentals of Radar Signal Processing" Mark A. Richards
     if 0.0 >= p_d && p_d > 1.0 {
         return Err(RadarEquationsErrors::InvalidDetectionProbability);
     }

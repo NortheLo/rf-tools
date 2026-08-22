@@ -1,12 +1,24 @@
 use super::radar_equations_errors::RadarEquationsErrors;
 
+/// Calculates the required signal-to-noise ratio (SNR) in decibels
+/// for a non-fluctuating target using the Albersheim equation.
+///
+/// # Arguments
+///
+/// * `p_d` - Probability of detection.
+/// * `p_fa` - Probability of false alarm.
+/// * `n` - Number of non-coherently integrated pulses.
+///
+/// # Returns
+///
+/// The required SNR in decibels (dB).
+///
+/// # References
+///
+/// * W. Albersheim, "Albersheim's Equation for Calculating Radar Detection
+///   Probabilities," alternative forms:
+///   <https://radarsp.weebly.com/uploads/2/1/4/7/21471216/albersheim_alternative_forms.pdf>
 pub fn albersheim(p_d: f64, p_fa: f64, n: u64) -> Result<f64, RadarEquationsErrors> {
-    // Albersheim equation for calculating the SNR [dB] of non-fluctuation targets based on
-    // P_d: Detection probability
-    // P_fa: False-Alarm probability
-    // N: Number of noncoherent integrated pulses
-    // Returns: SNR
-    // Source: https://radarsp.weebly.com/uploads/2/1/4/7/21471216/albersheim_alternative_forms.pdf
     if 0.0 >= p_d && p_d > 1.0 {
         return Err(RadarEquationsErrors::InvalidDetectionProbability);
     }
