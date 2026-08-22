@@ -46,7 +46,7 @@ mod tests {
 
         let result = friis_equation_lin(p_tx, g_tx, g_rx, lambda, distance);
 
-        let expected = 0.015831434944115281;
+        let expected = 0.015_831_434_944_115_28;
         approx_eq(result, expected);
     }
 
@@ -66,7 +66,7 @@ mod tests {
             distance,
         );
 
-        let expected = 11.995202806278449;
+        let expected = 11.995_202_806_278_45;
         approx_eq(result, expected);
     }
 }
