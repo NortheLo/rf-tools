@@ -15,6 +15,9 @@ pub enum Error {
 /// # Returns:
 ///
 /// * received signal power [dBm]
+///
+/// # References:
+/// https://de.mathworks.com/help/satcom/gs/satellite-link-budget.html
 pub fn link_budget<T: Float + std::iter::Sum>(
     p_tx: T,
     gain_stages: &[T],
