@@ -1,13 +1,13 @@
 use crate::constants::BOLTZMANN_CONSTANT;
 
 #[derive(Debug)]
-enum Error {
+pub enum Error {
     NonFinite,
     InvalidBandwidth,
     InvalidTemperature,
 }
 
-fn thermal_noise_power(temperature: f64, bandwidth: f64) -> Result<f64, Error> {
+pub fn thermal_noise_power(temperature: f64, bandwidth: f64) -> Result<f64, Error> {
     // Power of thermal noise in defined by P_noise = k_b * T * BW
     // Args:
     // Temperature [K]

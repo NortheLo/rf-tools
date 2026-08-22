@@ -1,5 +1,7 @@
-use crate::conversion::lin_to_db_amp;
+use crate::conversion::power::*;
 use num_traits::Float;
+
+
 pub fn friis_equation_lin<T: Float>(p_tx: T, g_tx: T, g_rx: T, lambda: T, distance: T) -> T {
     let four_pi = T::from(4.0 * std::f64::consts::PI).unwrap();
 
@@ -16,7 +18,6 @@ pub fn friis_equation_log<T: Float>(p_tx: T, g_tx: T, g_rx: T, lambda: T, distan
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::conversion::*;
 
     // Reference Values can be generated here: https://electrotopic.com/de/friis-ubertragungsrechner/#gsc.tab=0
     // Settings are:

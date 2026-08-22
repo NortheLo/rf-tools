@@ -1,1 +1,1 @@
-mod friis_transmission_equation;
+pub mod friis_transmission_equation;

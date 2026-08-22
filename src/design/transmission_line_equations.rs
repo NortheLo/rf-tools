@@ -1,16 +1,38 @@
 #[derive(Debug)]
-enum Error {
+pub enum Error {
     InvalidReflectionCoefficient,
+    InvalidImpedance,
     NonFinite,
 }
-fn reflection_coefficient(z_0: f64, z_l: f64) -> Result<f64, Error> {
-    // Reflection coefficient based on the impedance mismatch between source and load.
-    // Args:
-    // Z_0: Reference Impedance
-    // Z_L: Load Impedance
-    // Returns:
-    // Reflection Coefficient
-    // Source: https://en.wikipedia.org/wiki/Reflection_coefficient
+
+
+/// Calculates the reflection coefficient caused by an impedance mismatch
+/// between a reference impedance and a load impedance.
+///
+/// The reflection coefficient is calculated as:
+///
+/// `Γ = (Z_L - Z_0) / (Z_L + Z_0)`
+///
+/// # Arguments
+///
+/// * `z_0` - Reference impedance in ohms (Ω).
+/// * `z_l` - Load impedance in ohms (Ω).
+///
+/// # Returns
+///
+/// The voltage reflection coefficient, ranging from -1.0 to 1.0
+/// for real-valued impedances.
+///
+/// Returns [`Error::NonFinite`] if the result is not finite.
+///
+/// # References
+///
+/// * [Reflection coefficient](https://en.wikipedia.org/wiki/Reflection_coefficient)
+pub fn reflection_coefficient(z_0: f64, z_l: f64) -> Result<f64, Error> {
+    if !z_0.is_finite() || !z_l.is_finite() || z_0 <= 0.0 || z_l < 0.0 {
+        return Err(Error::InvalidImpedance);
+    }
+
     let ref_coef = (z_l - z_0) / (z_l + z_0);
 
     ref_coef
@@ -19,14 +41,33 @@ fn reflection_coefficient(z_0: f64, z_l: f64) -> Result<f64, Error> {
         .ok_or(Error::NonFinite)
 }
 
-fn vswr(reflection_coeff: f64) -> Result<f64, Error> {
-    // Voltage-Standing-Wave-Ratio defines the relationship between |V_max| / |V_min|
-    // Args:
-    // Reflection Coefficient
-    // Returns:
-    // VSWR
-    // Source: https://en.wikipedia.org/wiki/Standing_wave_ratio
-    if reflection_coeff > 1.0 || reflection_coeff < -1.0 {
+/// Calculates the voltage standing wave ratio (VSWR) from a reflection
+/// coefficient.
+///
+/// VSWR describes the ratio between the maximum and minimum voltage
+/// amplitudes on a transmission line:
+///
+/// `VSWR = (1 + |Γ|) / (1 - |Γ|)`
+///
+/// # Arguments
+///
+/// * `reflection_coeff` - Voltage reflection coefficient in the range
+///   `-1.0..=1.0`.
+///
+/// # Returns
+///
+/// The voltage standing wave ratio (VSWR).
+///
+/// Returns [`Error::InvalidReflectionCoefficient`] if the reflection
+/// coefficient is outside the valid range.
+///
+/// Returns [`Error::NonFinite`] if the calculated VSWR is not finite.
+///
+/// # References
+///
+/// * [Standing wave ratio](https://en.wikipedia.org/wiki/Standing_wave_ratio)
+pub fn vswr(reflection_coeff: f64) -> Result<f64, Error> {
+    if !reflection_coeff.is_finite() || !(-1.0..=1.0).contains(&reflection_coeff) {
         return Err(Error::InvalidReflectionCoefficient);
     }
 

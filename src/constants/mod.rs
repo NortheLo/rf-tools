@@ -1,3 +1,3 @@
-mod constants;
+mod electromagnet;
 
-pub use constants::electromagnetic::*;
+pub use electromagnet::electromagnetic::*;

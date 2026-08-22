@@ -67,15 +67,7 @@ impl SwerlingCase {
     }
 
     pub fn alpha(&self, n: usize) -> f64 {
-        match self {
-            _ => {
-                if n < 40 {
-                    0.0
-                } else {
-                    0.25
-                }
-            }
-        }
+        if n < 40 { 0.0 } else { 0.25 }
     }
 }
 
@@ -131,7 +123,7 @@ pub fn shnidman(
         * (Float::exp(27.31 * p_d - 25.14)
             + (p_d - 0.8) * (0.7 * Float::ln(1e-5 / p_fa) + (2.0 * n as f64 - 20.0) / 80.0));
 
-    let c_db = if 0.1 <= p_d && p_d <= 0.872 {
+    let c_db = if (0.1..=0.872).contains(&p_d) {
         c_1
     } else {
         c_1 + c_2
