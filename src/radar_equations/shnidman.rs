@@ -107,11 +107,11 @@ pub fn shnidman(
     n: usize,
     model: SwerlingCase,
 ) -> Result<f64, RadarEquationsErrors> {
-    if 0.0 >= p_d && p_d > 1.0 {
+    if 0.0 >= p_d || p_d > 1.0 {
         return Err(RadarEquationsErrors::InvalidDetectionProbability);
     }
 
-    if 0.0 >= p_fa && p_fa > 1.0 {
+    if 0.0 >= p_fa || p_fa > 1.0 {
         return Err(RadarEquationsErrors::InvalidFalseAlarmProbability);
     }
 
@@ -165,7 +165,7 @@ mod tests {
         }
     }
     #[test]
-    fn test_shnidman_w_MATLAB_ref() {
+    fn test_shnidman_w_matlab_ref() {
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("src")
             .join("radar_equations")

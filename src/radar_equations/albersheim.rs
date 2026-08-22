@@ -19,11 +19,11 @@ use super::radar_equations_errors::RadarEquationsErrors;
 ///   Probabilities," alternative forms:
 ///   <https://radarsp.weebly.com/uploads/2/1/4/7/21471216/albersheim_alternative_forms.pdf>
 pub fn albersheim(p_d: f64, p_fa: f64, n: u64) -> Result<f64, RadarEquationsErrors> {
-    if 0.0 >= p_d && p_d > 1.0 {
+    if 0.0 >= p_d || p_d > 1.0 {
         return Err(RadarEquationsErrors::InvalidDetectionProbability);
     }
 
-    if 0.0 >= p_fa && p_fa > 1.0 {
+    if 0.0 >= p_fa || p_fa > 1.0 {
         return Err(RadarEquationsErrors::InvalidFalseAlarmProbability);
     }
 
@@ -54,7 +54,7 @@ mod tests {
     #[test]
     fn test_albersheim() {
         // Results are from MATLAB albersheim function
-        let snr = albersheim(0.5, 1e-6, 1).unwrap();
+        let snr = albersheim(0.5, 1e-6, 1).expect("This should not panic");
         let expected = 11.231984877880109;
         assert!((snr - expected).abs() < EPS);
 

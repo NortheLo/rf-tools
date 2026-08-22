@@ -4,6 +4,6 @@ pub mod electromagnetic {
 
     pub const SPEED_OF_LIGHT: f64 = 299_792_458.0; // [m/s]
 
-    pub const VACUUM_PERMITTIVITY: f64 = 8.854_187_8128e-12; // [F/m]
-    pub const VACUUM_PERMEABILITY: f64 = 1.256_637_06212e-6; // [N/A²]
+    pub const VACUUM_PERMITTIVITY: f64 = 8.854_187_812_8e-12; // [F/m]
+    pub const VACUUM_PERMEABILITY: f64 = 1.256_637_062_12e-6; // [N/A²]
 }
