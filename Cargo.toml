@@ -11,5 +11,6 @@ repository = "https://github.com/NortheLo/rf-tools.git"
 [dependencies]
 num-traits = "0.2.19"
 
-# for debugging purposes
+[dev-dependencies]
 proptest = "1.11.0"
+csv = "1.4.0"

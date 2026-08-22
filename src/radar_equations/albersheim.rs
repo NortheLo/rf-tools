@@ -34,11 +34,11 @@ pub fn albersheim(p_d: f64, p_fa: f64, n: u64) -> Result<f64, RadarEquationsErro
     }
 }
 
-use proptest::prelude::*;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
 
     const EPS: f64 = 1e-9;
 
