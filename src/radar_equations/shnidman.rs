@@ -81,3 +81,59 @@ pub fn shnidman(p_d: f64, p_fa: f64, n: usize, model: SwerlingCase) -> Result<f6
 
     x.is_finite().then_some(x).ok_or(RadarEquationsErrors::IsInvalid)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use csv::Reader;
+    use std::fs::File;
+    use std::path::PathBuf;
+
+    const EPS: f64 = 1e-10;
+
+    fn model_from_int(value: usize) -> SwerlingCase {
+        match value {
+            1 => SwerlingCase::I,
+            2 => SwerlingCase::II,
+            3 => SwerlingCase::III,
+            4 => SwerlingCase::IV,
+            5 => SwerlingCase::V,
+            _ => panic!("invalid model"),
+        }
+    }
+    #[test]
+    fn test_shnidman_w_MATLAB_ref() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                            .join("src")
+                            .join("radar_equations")
+                            .join("test_data")
+                            .join("shnidman_reference.csv");
+
+        let file = File::open(path)
+            .expect("missing MATLAB reference file");
+
+        let mut reader = Reader::from_reader(file);
+
+
+        for record in reader.records() {
+            let record = record.unwrap();
+
+            let p_d: f64 = record[0].parse().unwrap();
+            let p_fa: f64 = record[1].parse().unwrap();
+            let n: usize = record[2].parse().unwrap();
+            let model_id: usize = record[3].parse().unwrap();
+
+            let matlab_result: f64 = record[4].parse().unwrap();
+
+            let res = shnidman(p_d, p_fa, n, model_from_int(model_id)).expect("shnidman failed");
+
+            let error = (res - matlab_result).abs();
+
+            assert!(
+                error < EPS,
+                "Mismatch: pd={p_d} pfa={p_fa} n={n} model={model_id} Rust={res} MATLAB={matlab_result} error={error}"
+            );
+        }
+    }
+
+}
