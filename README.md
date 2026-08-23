@@ -1,4 +1,15 @@
 # *rf-tools* 
-This is a library written partly during my studies for my jupyter notes and as a part as Rust learning project.
-The goal is to provide the most used functions in a single place, where they are written once and tested thoroughly.
-API should be as easy to use like more popular tools like MATLAB or Python with their respective toolboxes/libraries.
+## Intention
+This is a library features equations and tools I needed during my studies and other projects.  
+The API should be easy to use like in other tools like MATLAB or Python.
+## Functions:
+- Shnidman Equation for minimum SNR needed for fluctuation targets
+- Albersheim for minimum SNR needed for constant targets
+- Several conversion functions for db/dBm
+- Frequency <-> Wavelength conversion
+- Friis Transmission Equation
+- Link Budget calculation
+- Equivalent Isotropically Radiated Power (EIRP)
+- Thermal noise power
+- S-Parameter Matrix
+- Z-Parameter Matrix
