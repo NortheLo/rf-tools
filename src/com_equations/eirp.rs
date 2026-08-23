@@ -17,10 +17,10 @@ pub enum Error {
 /// https://en.wikipedia.org/wiki/Effective_radiated_power
 pub fn eirp<T: Float>(p_tx: T, antenna_gain: T) -> Result<T, Error> {
     if !p_tx.is_finite() {
-        return Err(Error::NonFiniteTransmissionPower)
+        return Err(Error::NonFiniteTransmissionPower);
     }
     if !antenna_gain.is_finite() {
-        return Err(Error::NonFiniteAntennaGain)
+        return Err(Error::NonFiniteAntennaGain);
     }
 
     Ok(p_tx + antenna_gain)
