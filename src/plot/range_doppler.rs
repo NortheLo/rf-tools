@@ -1,6 +1,8 @@
 use ndarray::ArrayView2;
 use ruviz::prelude::*;
 
+
+/// Plots the range doppler map
 pub fn range_doppler(
     rdm: &ArrayView2<f32>,
     filename: &str,
